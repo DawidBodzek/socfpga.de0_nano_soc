@@ -1,0 +1,9 @@
+[submodule "sw/meta-intel-fpga"]
+	path = sw/meta-intel-fpga
+	url = https://git.yoctoproject.org/meta-intel-fpga
+[submodule "sw/poky"]
+	path = sw/poky
+	url = https://git.yoctoproject.org/poky
+[submodule "sw/meta-openembedded"]
+	path = sw/meta-openembedded
+	url = https://git.openembedded.org/meta-openembedded

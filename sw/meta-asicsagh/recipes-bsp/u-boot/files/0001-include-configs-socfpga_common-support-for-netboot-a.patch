@@ -1,0 +1,56 @@
+From c149818cc71cd7b8b940ff31cec0809ed7059867 Mon Sep 17 00:00:00 2001
+From: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
+Date: Fri, 10 Oct 2025 16:38:04 +0200
+Subject: [PATCH] include: configs: socfpga_common: support for netboot added
+
+Upstream-Status: Inappropriate [internal configuration]
+Signed-off-by: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
+---
+ arch/arm/dts/socfpga.dtsi        | 3 +--
+ include/configs/socfpga_common.h | 9 +++++++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/dts/socfpga.dtsi b/arch/arm/dts/socfpga.dtsi
+index ff79d335ac7..7b0f3392196 100644
+--- a/arch/arm/dts/socfpga.dtsi
++++ b/arch/arm/dts/socfpga.dtsi
+@@ -570,7 +570,7 @@
+ 			reg = <0xff702000 0x2000>;
+ 			interrupts = <0 120 4>;
+ 			interrupt-names = "macirq";
+-			mac-address = [00 00 00 00 00 00];/* Filled in by U-Boot */
++			mac-address = [0e f4 07 97 d6 e9];
+ 			clocks = <&emac_1_clk>;
+ 			clock-names = "stmmaceth";
+ 			resets = <&rst EMAC1_RESET>;
+@@ -579,7 +579,6 @@
+ 			snps,perfect-filter-entries = <128>;
+ 			tx-fifo-depth = <4096>;
+ 			rx-fifo-depth = <4096>;
+-			status = "disabled";
+ 		};
+ 
+ 		gpio0: gpio@ff708000 {
+diff --git a/include/configs/socfpga_common.h b/include/configs/socfpga_common.h
+index 5d7f07f3dbd..a37a9f1799a 100644
+--- a/include/configs/socfpga_common.h
++++ b/include/configs/socfpga_common.h
+@@ -176,6 +176,15 @@
+ 	"socfpga_legacy_reset_compat=1\0" \
+ 	"prog_core=if load mmc 0:1 ${loadaddr} fit_spl_fpga.itb;" \
+ 		   "then fpga loadmk 0 ${loadaddr}:fpga-core-1; fi\0" \
++	"hostip=192.168.0.100\0" \
++	"netboot=" \
++		"dhcp ${loadaddr} ${hostip}:de0_nano_soc.rbf && " \
++		"fpga load 0 ${loadaddr} ${filesize} && " \
++		"bridge enable && " \
++		"tftp ${fdt_addr_r} ${hostip}:socfpga_cyclone5_de0_nano_soc.dtb && " \
++		"tftp ${kernel_addr_r} ${hostip}:zImage && " \
++		"setenv bootargs \"earlycon ip=dhcp root=/dev/nfs rootwait rw nfsroot=${hostip}:/srv/nfs/cyclone_rootfs,tcp,nfsvers=3\" && " \
++		"bootz ${kernel_addr_r} - ${fdt_addr_r}\0" \
+ 	SOCFPGA_BOOT_SETTINGS \
+ 	BOOTENV
+ 
+-- 
+2.43.7
+

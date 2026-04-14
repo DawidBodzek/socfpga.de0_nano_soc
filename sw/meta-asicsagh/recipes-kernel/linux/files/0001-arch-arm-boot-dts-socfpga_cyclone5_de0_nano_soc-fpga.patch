@@ -1,0 +1,41 @@
+From b8b71aa82d4b923f47ba34328b3de8ab2ebde775 Mon Sep 17 00:00:00 2001
+From: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
+Date: Fri, 10 Oct 2025 17:18:47 +0200
+Subject: [PATCH] arch: arm: boot: dts: socfpga_cyclone5_de0_nano_soc: fpga
+ device defined
+
+Upstream-Status: Inappropriate [internal configuration]
+Signed-off-by: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
+---
+ .../dts/socfpga_cyclone5_de0_nano_soc.dts     | 21 +++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
+index c8f051fb2bf6..3d4299022726 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
+@@ -39,6 +39,22 @@ hps0 {
+ 			linux,default-trigger = "heartbeat";
+ 		};
+ 	};
++
++	fpga@c0000000 {
++		compatible = "simple-bus";
++		reg = <0xc0000000 0x3c000000>,
++			<0xff200000 0x200000>;
++		reg-names = "h2f", "h2f_lw";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges = <0x00000000 0xc0000000 0x10000>,
++			<0x00010000 0xff210000 0x1000>;
++
++		ocm: ocm@0 {
++			compatible = "agh,ocm";
++			reg = <0x00000000 0x10000>;
++		};
++	};
+ };
+
+ &gmac1 {
+--
+2.43.7

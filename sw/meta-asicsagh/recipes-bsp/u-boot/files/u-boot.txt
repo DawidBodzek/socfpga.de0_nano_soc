@@ -1,0 +1,5 @@
+fatload mmc 0:1 ${loadaddr} de0_nano_soc.rbf
+fpga load 0 ${loadaddr} ${filesize}
+
+bridge enable
+run bootcmd_mmc0
