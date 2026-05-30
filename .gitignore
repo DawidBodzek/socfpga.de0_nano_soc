@@ -1,5 +1,6 @@
 .dvt
 .vscode
+.DS_Store
 
 hw/fpga/.qsys_edit
 hw/fpga/db
