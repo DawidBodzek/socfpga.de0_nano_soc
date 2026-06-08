@@ -41,11 +41,35 @@
          type = "String";
       }
    }
+   element de0_nano_soc
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element de0_nano_soc
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element hps
    {
       datum _sortIndex
       {
          value = "1";
+         type = "int";
+      }
+   }
+   element ltc2308_ctl
+   {
+      datum _sortIndex
+      {
+         value = "3";
          type = "int";
       }
    }
@@ -59,7 +83,7 @@
    }
 }
 ]]></parameter>
- <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
+ <parameter name="clockCrossingAdapter" value="FIFO" />
  <parameter name="device" value="5CSEMA4U23C6" />
  <parameter name="deviceFamily" value="Cyclone V" />
  <parameter name="deviceSpeedGrade" value="6" />
@@ -87,6 +111,7 @@
  <interface name="hps_io" internal="hps.hps_io" type="conduit" dir="end" />
  <interface name="memory" internal="hps.memory" type="conduit" dir="end" />
  <interface name="reset" internal="clk.clk_in_reset" type="reset" dir="end" />
+ <interface name="spi" internal="ltc2308_ctl.adc_spi" type="conduit" dir="end" />
  <module name="clk" kind="clock_source" version="25.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
@@ -623,6 +648,7 @@
   <parameter name="usb_mp_clk_div" value="0" />
   <parameter name="use_default_mpu_clk" value="true" />
  </module>
+ <module name="ltc2308_ctl" kind="ltc2308_ctl" version="1.0" enabled="1" />
  <module
    name="ocm"
    kind="altera_avalon_onchip_memory2"
@@ -657,6 +683,15 @@
  </module>
  <connection kind="avalon" version="25.1" start="hps.h2f_axi_master" end="ocm.s1">
   <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x00010000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps.h2f_lw_axi_master"
+   end="ltc2308_ctl.avalon_mm">
+  <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
@@ -666,10 +701,11 @@
    start="hps.h2f_lw_axi_master"
    end="ocm.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="baseAddress" value="0x00010000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection kind="clock" version="25.1" start="clk.clk" end="ocm.clk1" />
+ <connection kind="clock" version="25.1" start="clk.clk" end="ltc2308_ctl.clock" />
  <connection kind="clock" version="25.1" start="clk.clk" end="hps.f2h_axi_clock" />
  <connection
    kind="clock"
@@ -682,8 +718,13 @@
    version="25.1"
    start="clk.clk"
    end="hps.h2f_lw_axi_clock" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk.clk_reset"
+   end="ltc2308_ctl.reset" />
  <connection kind="reset" version="25.1" start="clk.clk_reset" end="ocm.reset1" />
- <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
+ <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="FIFO" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.maxAdditionalLatency" value="1" />

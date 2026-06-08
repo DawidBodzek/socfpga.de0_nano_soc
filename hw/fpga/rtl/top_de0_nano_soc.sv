@@ -1,9 +1,9 @@
 /* Copyright (C) 2026  AGH University of Krakow */
 
 module top_de0_nano_soc (
-    input logic         CLOCK_50,
+    input logic         CLOCK_50,			/* FPGA CLK */
 
-    output logic [14:0] HPS_DDR3_ADDR,
+    output logic [14:0] HPS_DDR3_ADDR,		/* HPS */
     output logic [2:0]  HPS_DDR3_BA,
     output logic        HPS_DDR3_CAS_N,
     output logic        HPS_DDR3_CKE,
@@ -41,9 +41,27 @@ module top_de0_nano_soc (
     inout logic [7:0]   HPS_USB_DATA,
     input logic         HPS_USB_CLKOUT,
     input logic         HPS_USB_DIR,
-    input logic         HPS_USB_NXT
+    input logic         HPS_USB_NXT,
+	 
+	 output logic 			ADC_CONVST,			/* ADC */
+	 output logic 			ADC_SCLK,
+	 output logic 			ADC_SDI,
+	 input logic  			ADC_SDO
 );
 
+/* Signal Tap */
+
+(* noprune *) logic DEBUG_spi_sck;
+(* noprune *) logic DEBUG_spi_mosi;
+(* noprune *) logic DEBUG_spi_convst;
+(* noprune *) logic DEBUG_spi_miso;
+
+always_ff @(posedge CLOCK_50) begin
+	DEBUG_spi_convst <= ADC_CONVST;
+	DEBUG_spi_sck <= ADC_SCLK;
+	DEBUG_spi_mosi <= ADC_SDI;
+	DEBUG_spi_miso <= ADC_SDO;
+end
 
 /* Submodules placement */
 
@@ -106,7 +124,12 @@ de0_nano_soc u0 (
     .hps_io_hps_io_usb1_inst_CLK(HPS_USB_CLKOUT),
     .hps_io_hps_io_usb1_inst_STP(HPS_USB_STP),
     .hps_io_hps_io_usb1_inst_DIR(HPS_USB_DIR),
-    .hps_io_hps_io_usb1_inst_NXT(HPS_USB_NXT)
+    .hps_io_hps_io_usb1_inst_NXT(HPS_USB_NXT),
+	 
+	 .spi_adc_sclk(ADC_SCLK),
+	 .spi_adc_sdi(ADC_SDI),
+	 .spi_adc_convst(ADC_CONVST),
+	 .spi_adc_sdo(ADC_SDO)
 );
 
 endmodule

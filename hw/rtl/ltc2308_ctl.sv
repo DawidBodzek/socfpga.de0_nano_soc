@@ -4,12 +4,14 @@ module ltc2308_ctl import csr_pkg::*; (
 
     output logic        spi_sck,
     output logic        spi_mosi,
-    output logic        convst,
+    output logic        spi_convst,
 
     output logic [31:0] avalon_readdata,
-    output logic        avalon_readdatavalid,
+	 //output logic [1:0]  avalon_response,
+    //output logic        avalon_readdatavalid,
+	 //output logic 			avalon_writeresponsevalid,
     output logic        avalon_waitrequest,
-
+	 
     input  logic        spi_miso,
 
     input  logic [31:0] avalon_writedata,
@@ -65,7 +67,7 @@ ctl u_ctl (
     .spi_en,
     .spi_rx_data,
 
-    .convst,
+    .spi_convst,
     .adc_data(hwif_in)
 );
 
@@ -88,7 +90,7 @@ csr u_csr (
 	.avalon_address,
 	.avalon_writedata,
 	.avalon_byteenable,
-	.avalon_readdatavalid,
+	.avalon_readdatavalid(),
 	.avalon_writeresponsevalid(),
 	.avalon_readdata,
 	.avalon_response(),

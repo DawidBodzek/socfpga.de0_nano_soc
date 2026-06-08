@@ -175,9 +175,6 @@ module csr import csr_pkg::*; (
         if(decoded_reg_strb.ctrl && decoded_req_is_wr) begin // SW write
             next_c = (field_storage.ctrl.start_conv.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
             load_next_c = '1;
-        end else begin // singlepulse clears back to 0
-            next_c = '0;
-            load_next_c = '1;
         end
         field_combo.ctrl.start_conv.next = next_c;
         field_combo.ctrl.start_conv.load_next = load_next_c;

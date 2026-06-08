@@ -9,7 +9,6 @@ hw/fpga/incremental_db
 hw/fpga/hps_isw_handoff
 hw/fpga/output_files
 hw/fpga/simulation
-hw/fpga/*.bak
 hw/fpga/*.BAK*
 hw/fpga/*.csv
 hw/fpga/*.json
@@ -20,6 +19,8 @@ hw/fpga/*.qdf
 hw/fpga/*.sopcinfo
 hw/fpga/*.tcl~
 hw/fpga/*.txt
+
+hw/**/*.bak
 
 sw/build
 sw/buildtools
