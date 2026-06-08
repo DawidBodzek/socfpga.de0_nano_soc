@@ -7,41 +7,40 @@ addrmap csr {
     reg {
         name = "Control Register";
 			
-		field {
-				desc = "(1) start conversion";
-				singlepulse;
-		} start_conv = 0;
+	field {
+		desc = "(1) start conversion";
+	} start_conv = 0;
     } ctrl @0x00;
 
     reg {
-		name = "Channel Configuration Register";
+	name = "Channel Configuration Register";
 	
-		field {
-			desc = "(1) sleep mode";
-		} sleep = 0;
+	field {
+		desc = "(1) sleep mode";
+	} sleep = 0;
 		
-		field {
-			desc = "(1) unipolar, (0) bipolar";
-		} unipolar = 1;
+	field {
+		desc = "(1) unipolar, (0) bipolar";
+	} unipolar = 1;
 		
-		field {} channel_addr[3:2] = 0;
+	field {} channel_addr[3:2] = 0;
 		
-		field {
-			desc = "(1) odd, (0) sign";
-		} odd = 1;
+	field {
+		desc = "(1) odd, (0) sign";
+	} odd = 1;
 		
-		field {
-			desc = "(1) single-ended, (0) differential";
-		} single_ended = 1;
+	field {
+		desc = "(1) single-ended, (0) differential";
+	} single_ended = 1;
     } cfg @0x04;
 	
     reg {
-		name = "Data Register";
+	name = "Data Register";
 
-		field {
-			sw = r;
-			hw = w;
-			desc = "ADC conversion result";
-		} result[11:0];
+	field {
+		sw = r;
+		hw = w;
+		desc = "ADC conversion result";
+	} result[11:0];
     } data @0x08;
 };
