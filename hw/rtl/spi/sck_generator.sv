@@ -5,6 +5,7 @@ module sck_generator (
 	output logic 	   spi_sck,
 	output logic 	   rising_edge,
 	output logic 	   falling_edge,
+	
 	input  logic [3:0] divider,
 	input  logic 	   spi_sck_en
 );

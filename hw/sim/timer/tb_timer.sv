@@ -57,7 +57,7 @@ task test_timer();
     repeat(10)
         @(negedge clk);
 
-    t_load = 7'b0;
+    t_load = 1'b0;
 
 endtask
 

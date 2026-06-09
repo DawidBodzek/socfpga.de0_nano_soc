@@ -1,8 +1,9 @@
-module ctl import csr_pkg::csr__in_t; (
+module ctl 
+    import csr_pkg::*; 
+(
     input logic         clk,
     input logic         rst_n,
 
-    output csr__in_t    adc_data,
     output logic [6:0]  t_ticks,
     output logic        t_load,
     output logic        spi_en,
@@ -11,7 +12,9 @@ module ctl import csr_pkg::csr__in_t; (
     input  logic [11:0] spi_rx_data,
     input  logic        spi_done,
     input  logic        t_done,
-    input  logic        en
+    input  logic        en,
+
+    output csr__in_t    adc_data
 );
 
 /* User defined types and constants */

@@ -6,6 +6,7 @@ module spi_master (
 	output logic 		spi_done,
 	output logic 		spi_sck_en,
 	output logic 		spi_mosi,
+	
 	input  logic [5:0]  spi_tx_data,
 	input  logic 		spi_en,
 	input  logic 		spi_miso,

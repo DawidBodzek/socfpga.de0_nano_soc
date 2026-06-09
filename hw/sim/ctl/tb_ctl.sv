@@ -1,4 +1,6 @@
-module tb_ctl import csr_pkg::*; ();
+module tb_ctl 
+    import csr_pkg::*; 
+();
 
 /* Local variables and signals */
 
@@ -8,11 +10,11 @@ int ok;
 logic t_done, t_load;
 logic [6:0] t_ticks;
 
-logic spi_en, spi_done, spi_sck, spi_mosi, spi_miso;
+logic spi_en, spi_done, spi_sck, spi_mosi, spi_miso, spi_convst;
 logic [11:0] spi_rx_data;
 logic [5:0] spi_tx_data;
 
-logic en, convst;
+logic en;
 
 csr__in_t adc_data;
 
@@ -32,7 +34,7 @@ ctl dut (
     .spi_en,
     .spi_rx_data,
 
-    .convst,
+    .spi_convst,
     .adc_data
 );
 

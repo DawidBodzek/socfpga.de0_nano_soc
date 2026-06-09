@@ -3,6 +3,7 @@ module timer (
     input  logic       rst_n,
 
     output logic       t_done,
+    
     input  logic       t_load,
     input  logic [6:0] t_ticks
 );

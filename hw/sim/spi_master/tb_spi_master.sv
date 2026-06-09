@@ -86,7 +86,7 @@ task test_spi_transmitter();
 	repeat (10)
 		@(negedge clk);
 		
-	spi_tx_data = 8'h00;
+	spi_tx_data = 6'b0;
 	
 endtask
 
@@ -200,7 +200,7 @@ task test_spi_master();
 	repeat(10)
 		@(negedge clk);
 	
-	spi_tx_data = 8'b0;
+	spi_tx_data = 6'b0;
 	
 endtask
 
@@ -219,7 +219,7 @@ initial begin
 	rst_n = 1'b1;
 	spi_en = 1'b0;
 	divider = 4'h0;
-	spi_tx_data = 8'h00;
+	spi_tx_data = 6'b0;
 	spi_miso = 1'b0;
 	
 	//test_spi_transmitter();
