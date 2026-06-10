@@ -9,6 +9,7 @@ addrmap csr {
 			
 		field {
 			desc = "(1) start conversion";
+			singlepulse;
 		} start_conv = 0;
 	} ctrl @0x00;
 
