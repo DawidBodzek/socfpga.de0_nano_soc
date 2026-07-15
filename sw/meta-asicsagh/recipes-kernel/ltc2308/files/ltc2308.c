@@ -29,7 +29,7 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
 
 static const struct file_operations ltc2308_fops = {
     .owner = THIS_MODULE,
-    .read = ltc2308_read,
+    .read = ltc2308_read
 };
 
 static int ltc2308_probe(struct platform_device *pdev)
