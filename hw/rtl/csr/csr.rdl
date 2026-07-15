@@ -13,6 +13,17 @@ addrmap csr {
 		} start_conv = 0;
 	} ctrl @0x00;
 
+	reg {
+		name = "Status Register";
+
+		field {
+			desc = "(1) data valid";
+			sw = r;
+			hwset;
+			hwclr;
+		} data_valid = 0;
+	} status @0x04;
+
     reg {
 		name = "Channel Configuration Register";
 	
@@ -33,7 +44,7 @@ addrmap csr {
 		field {
 			desc = "(1) single-ended, (0) differential";
 		} single_ended = 1;
-    } cfg @0x04;
+    } cfg @0x08;
 	
     reg {
 		name = "Data Register";
@@ -41,7 +52,8 @@ addrmap csr {
 		field {
 			sw = r;
 			hw = w;
+			swacc;
 			desc = "ADC conversion result";
 		} result[11:0];
-    } data @0x08;
+    } data @0x0C;
 };

@@ -21,9 +21,9 @@ typedef enum logic {
 
 state_t state, state_nxt;
 
-logic sck_nxt, sck_buf;
 logic [3:0] counter, counter_nxt;
 logic [3:0] half_divider;
+logic 		sck_nxt, sck_buf;
 
 /* Signals assignments */
 

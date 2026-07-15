@@ -26,12 +26,12 @@ typedef enum logic {
 
 state_t state, state_nxt;
 
-logic spi_sck_en_nxt;
 logic [12:0] shift_reg, shift_reg_nxt;
-logic [3:0] counter, counter_nxt;
+logic [3:0]  counter, counter_nxt;
+logic 		 spi_sck_en_nxt;
 
-logic spi_done_nxt;
 logic [11:0] spi_rx_data_nxt;
+logic 		 spi_done_nxt;
 
 /* Signals assignments */
 

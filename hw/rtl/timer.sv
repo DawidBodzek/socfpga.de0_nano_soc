@@ -4,8 +4,8 @@ module timer (
 
     output logic       t_done,
     
-    input  logic       t_load,
-    input  logic [6:0] t_ticks
+    input  logic [6:0] t_ticks,
+    input  logic       t_load
 );
 
 /* Local variables and signals */

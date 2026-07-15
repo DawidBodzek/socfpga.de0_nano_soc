@@ -78,6 +78,7 @@ module csr (
     //--------------------------------------------------------------------------
     typedef struct {
         logic ctrl;
+        logic status;
         logic cfg;
         logic data;
     } decoded_reg_strb_t;
@@ -94,8 +95,9 @@ module csr (
         is_valid_addr = '1; // No error checking on valid address access
         is_invalid_rw = '0;
         decoded_reg_strb.ctrl = cpuif_req_masked & (cpuif_addr == 4'h0) & cpuif_req_is_wr;
-        decoded_reg_strb.cfg = cpuif_req_masked & (cpuif_addr == 4'h4) & cpuif_req_is_wr;
-        decoded_reg_strb.data = cpuif_req_masked & (cpuif_addr == 4'h8) & !cpuif_req_is_wr;
+        decoded_reg_strb.status = cpuif_req_masked & (cpuif_addr == 4'h4) & !cpuif_req_is_wr;
+        decoded_reg_strb.cfg = cpuif_req_masked & (cpuif_addr == 4'h8) & cpuif_req_is_wr;
+        decoded_reg_strb.data = cpuif_req_masked & (cpuif_addr == 4'hc) & !cpuif_req_is_wr;
         decoded_err = (~is_valid_addr | is_invalid_rw) & decoded_req;
     end
 
@@ -115,6 +117,12 @@ module csr (
                 logic load_next;
             } start_conv;
         } ctrl;
+        struct {
+            struct {
+                logic next;
+                logic load_next;
+            } data_valid;
+        } status;
         struct {
             struct {
                 logic next;
@@ -146,6 +154,11 @@ module csr (
                 logic value;
             } start_conv;
         } ctrl;
+        struct {
+            struct {
+                logic value;
+            } data_valid;
+        } status;
         struct {
             struct {
                 logic value;
@@ -192,6 +205,32 @@ module csr (
         end
     end
     assign hwif_out.ctrl.start_conv.value = field_storage.ctrl.start_conv.value;
+    // Field: csr.status.data_valid
+    always_comb begin
+        automatic logic [0:0] next_c;
+        automatic logic load_next_c;
+        next_c = field_storage.status.data_valid.value;
+        load_next_c = '0;
+        if(hwif_in.status.data_valid.hwset) begin // HW Set
+            next_c = '1;
+            load_next_c = '1;
+        end else if(hwif_in.status.data_valid.hwclr) begin // HW Clear
+            next_c = '0;
+            load_next_c = '1;
+        end
+        field_combo.status.data_valid.next = next_c;
+        field_combo.status.data_valid.load_next = load_next_c;
+    end
+    always_ff @(posedge clk or negedge arst_n) begin
+        if(~arst_n) begin
+            field_storage.status.data_valid.value <= 1'h0;
+        end else begin
+            if(field_combo.status.data_valid.load_next) begin
+                field_storage.status.data_valid.value <= field_combo.status.data_valid.next;
+            end
+        end
+    end
+    assign hwif_out.status.data_valid.value = field_storage.status.data_valid.value;
     // Field: csr.cfg.sleep
     always_comb begin
         automatic logic [0:0] next_c;
@@ -307,6 +346,7 @@ module csr (
         end
     end
     assign hwif_out.cfg.single_ended.value = field_storage.cfg.single_ended.value;
+    assign hwif_out.data.result.swacc = decoded_reg_strb.data;
 
     //--------------------------------------------------------------------------
     // Write response
@@ -324,9 +364,11 @@ module csr (
     logic [31:0] readback_data;
 
     // Assign readback values to a flattened array
-    logic [31:0] readback_array[1];
-    assign readback_array[0][11:0] = (decoded_reg_strb.data && !decoded_req_is_wr) ? hwif_in.data.result.next : '0;
-    assign readback_array[0][31:12] = '0;
+    logic [31:0] readback_array[2];
+    assign readback_array[0][0:0] = (decoded_reg_strb.status && !decoded_req_is_wr) ? field_storage.status.data_valid.value : '0;
+    assign readback_array[0][31:1] = '0;
+    assign readback_array[1][11:0] = (decoded_reg_strb.data && !decoded_req_is_wr) ? hwif_in.data.result.next : '0;
+    assign readback_array[1][31:12] = '0;
 
     // Reduce the array
     always_comb begin
@@ -334,7 +376,7 @@ module csr (
         readback_done = decoded_req & ~decoded_req_is_wr;
         readback_err = '0;
         readback_data_var = '0;
-        for(int i=0; i<1; i++) readback_data_var |= readback_array[i];
+        for(int i=0; i<2; i++) readback_data_var |= readback_array[i];
         readback_data = readback_data_var;
     end
 

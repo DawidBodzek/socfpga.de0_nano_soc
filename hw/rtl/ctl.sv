@@ -30,11 +30,11 @@ localparam T_CONV = 80;
 
 /* Local variables and signals */
 
-state_t state, state_nxt;
+state_t   state, state_nxt;
 csr__in_t adc_data_nxt;
 
-logic t_load_nxt, spi_en_nxt, spi_convst_nxt;
 logic [6:0] t_ticks_nxt;
+logic       t_load_nxt, spi_en_nxt, spi_convst_nxt;
 
 /* Module internal logic */
 

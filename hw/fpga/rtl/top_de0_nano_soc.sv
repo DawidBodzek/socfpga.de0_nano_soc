@@ -15,7 +15,7 @@ module top_de0_nano_soc (
     output logic        HPS_DDR3_WE_N,
     output logic        HPS_DDR3_CK_P,
     output logic        HPS_DDR3_CK_N,
-    inout logic  [31:0] HPS_DDR3_DQ,
+    inout logic [31:0]  HPS_DDR3_DQ,
     inout logic [3:0]   HPS_DDR3_DQS_N,
     inout logic [3:0]   HPS_DDR3_DQS_P,
     input logic         HPS_DDR3_RZQ,
@@ -43,10 +43,10 @@ module top_de0_nano_soc (
     input logic         HPS_USB_DIR,
     input logic         HPS_USB_NXT,
 	 
-	 output logic 			ADC_CONVST,			/* ADC */
-	 output logic 			ADC_SCLK,
-	 output logic 			ADC_SDI,
-	 input logic  			ADC_SDO
+	output logic 		ADC_CONVST,			/* ADC */
+	output logic 		ADC_SCLK,
+	output logic 		ADC_SDI,
+	input logic  		ADC_SDO
 );
 
 /* Signal Tap */

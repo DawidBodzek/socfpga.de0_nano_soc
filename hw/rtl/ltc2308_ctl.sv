@@ -25,14 +25,19 @@ module ltc2308_ctl
 
 /* Local variables and signals */
 
-csr__in_t csr_in;
 csr__out_t csr_out;
+csr__in_t  csr_in;
 
 logic [11:0] spi_rx_data;
-logic spi_en, spi_done;
+logic        spi_en, spi_done;
 
-logic t_done, t_load;
 logic [6:0] t_ticks;
+logic       t_done, t_load;
+
+/* Signals assignments */
+
+assign csr_in.status.data_valid.hwset = spi_done;
+assign csr_in.status.data_valid.hwclr = csr_out.data.result.swacc;
 
 /* Submodules placements */
 
