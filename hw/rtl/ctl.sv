@@ -12,9 +12,10 @@ module ctl
     input  logic [11:0] spi_rx_data,
     input  logic        spi_done,
     input  logic        t_done,
+    input  logic        hwclr,
     input  logic        en,
 
-    output csr__in_t    adc_data
+    output csr__in_t    csr_in
 );
 
 /* User defined types and constants */
@@ -31,10 +32,15 @@ localparam T_CONV = 80;
 /* Local variables and signals */
 
 state_t   state, state_nxt;
-csr__in_t adc_data_nxt;
+csr__in_t csr_in_nxt;
 
 logic [6:0] t_ticks_nxt;
 logic       t_load_nxt, spi_en_nxt, spi_convst_nxt;
+
+/* Signals assignments */
+
+assign csr_in.status.data_valid.hwset = spi_done;
+assign csr_in.status.data_valid.hwclr = hwclr;
 
 /* Module internal logic */
 
@@ -78,13 +84,13 @@ always_ff @(posedge clk or negedge rst_n) begin
         spi_en <= 1'b0;
         spi_convst <= 1'b0;
         t_ticks <= 7'b0;
-        adc_data.data.result.next <= 12'b0;
+        csr_in.data.result.next <= 12'b0;
     end else begin
         t_load <= t_load_nxt;
         spi_en <= spi_en_nxt;
         spi_convst <= spi_convst_nxt;
         t_ticks <= t_ticks_nxt;
-        adc_data.data.result.next <= adc_data_nxt.data.result.next;
+        csr_in.data.result.next <= csr_in_nxt.data.result.next;
     end
 end
 
@@ -93,7 +99,7 @@ always_comb begin
     t_load_nxt = 1'b0;
     t_ticks_nxt = 7'b0;
     spi_en_nxt = 1'b0;
-    adc_data_nxt.data.result.next = adc_data.data.result.next;
+    csr_in_nxt.data.result.next = csr_in.data.result.next;
 
     case (state)
         IDLE: begin
@@ -115,7 +121,7 @@ always_comb begin
 
         SPI_ACTIVE: begin
             if (spi_done) begin
-                adc_data_nxt.data.result.next = spi_rx_data;
+                csr_in_nxt.data.result.next = spi_rx_data;
             end
         end
     endcase

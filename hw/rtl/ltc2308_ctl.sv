@@ -34,11 +34,6 @@ logic        spi_en, spi_done;
 logic [6:0] t_ticks;
 logic       t_done, t_load;
 
-/* Signals assignments */
-
-assign csr_in.status.data_valid.hwset = spi_done;
-assign csr_in.status.data_valid.hwclr = csr_out.data.result.swacc;
-
 /* Submodules placements */
 
 spi u_spi (
@@ -65,6 +60,7 @@ ctl u_ctl (
     .rst_n,
 
     .en(csr_out.ctrl.start_conv.value),
+    .hwclr(csr_out.data.result.swacc),
 
     .t_done,
     .t_load,
@@ -75,7 +71,7 @@ ctl u_ctl (
     .spi_rx_data,
 
     .spi_convst,
-    .adc_data(csr_in)
+    .csr_in
 );
 
 timer u_timer (

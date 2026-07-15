@@ -1,4 +1,4 @@
-From b8b71aa82d4b923f47ba34328b3de8ab2ebde775 Mon Sep 17 00:00:00 2001
+From 11e2d3b4b9e6bad967b304d9fc2ea18ddd39fe78 Mon Sep 17 00:00:00 2001
 From: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
 Date: Fri, 10 Oct 2025 17:18:47 +0200
 Subject: [PATCH] arch: arm: boot: dts: socfpga_cyclone5_de0_nano_soc: fpga
@@ -6,15 +6,16 @@ Subject: [PATCH] arch: arm: boot: dts: socfpga_cyclone5_de0_nano_soc: fpga
 
 Upstream-Status: Inappropriate [internal configuration]
 Signed-off-by: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
+Modified: Dawid Bodzek <dbodzek@student.agh.edu.pl>
 ---
- .../dts/socfpga_cyclone5_de0_nano_soc.dts     | 21 +++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ .../dts/socfpga_cyclone5_de0_nano_soc.dts     | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
-index c8f051fb2bf6..3d4299022726 100644
+index c8f051fb2bf6..c4905769c012 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
-@@ -39,6 +39,22 @@ hps0 {
+@@ -39,6 +39,30 @@ hps0 {
  			linux,default-trigger = "heartbeat";
  		};
  	};
@@ -24,18 +25,27 @@ index c8f051fb2bf6..3d4299022726 100644
 +		reg = <0xc0000000 0x3c000000>,
 +			<0xff200000 0x200000>;
 +		reg-names = "h2f", "h2f_lw";
++		
 +		#address-cells = <1>;
 +		#size-cells = <1>;
-+		ranges = <0x00000000 0xc0000000 0x10000>,
-+			<0x00010000 0xff210000 0x1000>;
++		
++		ranges = <0x00000000 0xc0000000 0x10>,
++			 <0x00010000 0xc0010000 0x10000>,
++			 <0x00020000 0xff200000 0x0020000>;
 +
-+		ocm: ocm@0 {
++		ltc2308: ltc2308@0 {
++			compatible = "ltc2308";
++			reg <0x00000000 0x10>;
++		};
++
++		ocm: ocm@10000 {
 +			compatible = "agh,ocm";
-+			reg = <0x00000000 0x10000>;
++			reg = <0x00010000 0x10000>;
 +		};
 +	};
  };
-
+ 
  &gmac1 {
---
-2.43.7
+-- 
+2.49.0
+
