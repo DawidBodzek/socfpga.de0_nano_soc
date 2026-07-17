@@ -3,18 +3,20 @@ module spi (
     input logic         rst_n,
 
     output logic [11:0] spi_rx_data,
-    output logic        spi_sck,
-    output logic        spi_done,
-    output logic        spi_mosi,
-
     input  logic [5:0]  spi_tx_data,
+
+    output logic        spi_sck,
+    output logic        spi_mosi,
     input  logic        spi_miso,
+    
+    output logic        spi_done,
     input  logic        spi_en
 );
 
 /* Local variables and signals */
 
-logic rising_edge, falling_edge, spi_sck_en;
+logic rising_edge, falling_edge;
+logic spi_sck_en;
 
 /* Submodules placements */
 

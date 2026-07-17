@@ -6,18 +6,20 @@ module ctl
 
     output logic [6:0]  t_ticks,
     output logic        t_load,
-	 output logic			fpga_irq,
-    output logic        spi_en,
-    output logic        spi_convst,
-
-    input  logic [11:0] spi_rx_data,
-    input  logic        spi_done,
     input  logic        t_done,
-    input  logic        hwclr,
+
+    output logic        spi_en,
+    input  logic        spi_done,
+
+    output logic		fpga_irq,
+    output logic        spi_convst,
     input  logic        en,
 
+    input  logic [11:0] spi_rx_data,
+    input  logic        hwclr,
+
     output csr__in_t    csr_in,
-	 input  csr__out_t   csr_out
+	input  csr__out_t   csr_out
 );
 
 /* User defined types and constants */

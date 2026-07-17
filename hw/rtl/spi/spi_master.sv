@@ -1,17 +1,18 @@
 module spi_master (
 	input logic 		clk,
 	input logic 		rst_n,
-	
-	output logic [11:0] spi_rx_data,
-	output logic 		spi_done,
-	output logic 		spi_sck_en,
+
 	output logic 		spi_mosi,
-	
-	input  logic [5:0]  spi_tx_data,
-	input  logic 		spi_en,
 	input  logic 		spi_miso,
+
+	output logic [11:0] spi_rx_data,
+	input  logic [5:0]  spi_tx_data,
 	
-	input  logic 		rising_edge,	/* spi_sck clock */
+	output logic 		spi_done,
+	input  logic 		spi_en,
+	
+	output logic 		spi_sck_en,
+	input  logic 		rising_edge,
 	input  logic 		falling_edge
 );
 

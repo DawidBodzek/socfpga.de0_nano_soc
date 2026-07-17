@@ -2,12 +2,13 @@ module sck_generator (
 	input logic 	   clk,
 	input logic 	   rst_n,
 	
-	output logic 	   spi_sck,
 	output logic 	   rising_edge,
 	output logic 	   falling_edge,
+
+	output logic 	   spi_sck,
+	input  logic 	   spi_sck_en,
 	
-	input  logic [3:0] divider,
-	input  logic 	   spi_sck_en
+	input  logic [3:0] divider
 );
 
 /* User defined types and constants */

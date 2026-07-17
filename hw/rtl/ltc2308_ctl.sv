@@ -3,26 +3,27 @@ module ltc2308_ctl
 (
     input logic         clk,
     input logic         rst_n,
-	 
-	 output logic 			fpga_irq,
 
+    output logic 	    fpga_irq,
+	 
     output logic        spi_sck,
     output logic        spi_mosi,
     output logic        spi_convst,
-
     input  logic        spi_miso,
 
     output logic [31:0] avalon_readdata,
-	output logic [1:0]  avalon_response,
     output logic        avalon_readdatavalid,
-	output logic 		avalon_writeresponsevalid,
-    output logic        avalon_waitrequest,
+    input  logic        avalon_read,
 
     input  logic [31:0] avalon_writedata,
+    input  logic        avalon_write,
+
+    output logic [1:0]  avalon_response,
+    output logic        avalon_writeresponsevalid,
+
+    output logic        avalon_waitrequest,
     input  logic [3:0]  avalon_byteenable,
-    input  logic [1:0]  avalon_address,
-    input  logic        avalon_read,
-    input  logic        avalon_write
+    input  logic [1:0]  avalon_address
 );
 
 /* Local variables and signals */
@@ -62,21 +63,22 @@ ctl u_ctl (
     .rst_n,
 
     .en(csr_out.ctrl.start_conv.value),
+    .spi_convst,
+    
     .hwclr(csr_out.data.result.swacc),
+    .spi_rx_data,
 
     .t_done,
     .t_load,
     .t_ticks,
 
-	 .fpga_irq,
+	.fpga_irq,
 	 
     .spi_done,
     .spi_en,
-    .spi_rx_data,
 
-    .spi_convst,
     .csr_in,
-	 .csr_out
+	.csr_out
 );
 
 timer u_timer (
@@ -85,6 +87,7 @@ timer u_timer (
 
     .t_done,
     .t_load,
+
     .t_ticks
 );
 
@@ -92,19 +95,22 @@ csr_wrapper u_csr_wrapper (
 	.clk,
 	.rst_n,
 
-	.avalon_read,
-	.avalon_write,
-	.avalon_waitrequest,
-	.avalon_address,
-	.avalon_writedata,
-	.avalon_byteenable,
-	.avalon_readdatavalid,
-	.avalon_writeresponsevalid,
 	.avalon_readdata,
-	.avalon_response,
+    .avalon_readdatavalid,
+	.avalon_read,
 
-	.csr_in,
-	.csr_out
+    .avalon_writedata,
+	.avalon_write,
+
+    .avalon_response,
+	.avalon_writeresponsevalid,
+
+	.avalon_waitrequest,
+	.avalon_byteenable,
+    .avalon_address,
+
+	.csr_out,
+    .csr_in
 );
 
 endmodule

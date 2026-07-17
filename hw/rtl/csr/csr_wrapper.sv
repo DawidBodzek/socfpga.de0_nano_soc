@@ -5,16 +5,18 @@ module csr_wrapper
     input logic         rst_n,
 
     output logic [31:0] avalon_readdata,
-    output logic [1:0]  avalon_response,
     output logic        avalon_readdatavalid,
-    output logic        avalon_writeresponsevalid,
-    output logic        avalon_waitrequest,
+    input  logic        avalon_read,
 
     input  logic [31:0] avalon_writedata,
+    input  logic        avalon_write,
+
+    output logic [1:0]  avalon_response,
+    output logic        avalon_writeresponsevalid,
+
+    output logic        avalon_waitrequest,
     input  logic [3:0]  avalon_byteenable,
     input  logic [1:0]  avalon_address,
-    input  logic        avalon_read,
-    input  logic        avalon_write,
         
     output csr__out_t   csr_out,
     input  csr__in_t    csr_in
@@ -23,8 +25,8 @@ module csr_wrapper
 /* Local variables and signals */
 
 logic [31:0] avalon_readdata_nxt;
-logic avalon_writeresponsevalid_nxt;
-logic avalon_readdatavalid_nxt;
+logic        avalon_writeresponsevalid_nxt;
+logic        avalon_readdatavalid_nxt;
 
 /* Submodules placement */
 
@@ -32,19 +34,22 @@ csr u_csr (
 	.clk,
 	.arst_n(rst_n),
 
-	.avalon_read,
-	.avalon_write,
-	.avalon_waitrequest,
-	.avalon_address,
-	.avalon_writedata,
-	.avalon_byteenable,
-	.avalon_readdatavalid(avalon_readdatavalid_nxt),
-	.avalon_writeresponsevalid(avalon_writeresponsevalid_nxt),
 	.avalon_readdata(avalon_readdata_nxt),
-	.avalon_response,
+    .avalon_readdatavalid(avalon_readdatavalid_nxt),
+	.avalon_read,
 
-	.hwif_in(csr_in),
-	.hwif_out(csr_out)
+    .avalon_writedata,
+	.avalon_write,
+
+    .avalon_response,
+	.avalon_writeresponsevalid(avalon_writeresponsevalid_nxt),
+
+	.avalon_waitrequest,
+	.avalon_byteenable,
+    .avalon_address,
+
+    .hwif_out(csr_out),
+	.hwif_in(csr_in)
 );
 
 /* Module internal logic */
