@@ -57,6 +57,14 @@
          type = "String";
       }
    }
+   element de0_nano_soc
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element hps
    {
       datum _sortIndex
@@ -104,11 +112,17 @@
  <instanceScript></instanceScript>
  <interface name="clk" internal="clk.clk_in" type="clock" dir="end" />
  <interface
+   name="hps_f2h_irq0"
+   internal="hps.f2h_irq0"
+   type="interrupt"
+   dir="start" />
+ <interface
    name="hps_h2f_reset"
    internal="hps.h2f_reset"
    type="reset"
    dir="start" />
  <interface name="hps_io" internal="hps.hps_io" type="conduit" dir="end" />
+ <interface name="irq" internal="ltc2308_ctl.irq" type="conduit" dir="end" />
  <interface name="memory" internal="hps.memory" type="conduit" dir="end" />
  <interface name="reset" internal="clk.clk_in_reset" type="reset" dir="end" />
  <interface name="spi" internal="ltc2308_ctl.adc_spi" type="conduit" dir="end" />
@@ -230,7 +244,7 @@
   <parameter name="F2SCLK_WARMRST_Enable" value="false" />
   <parameter name="F2SDRAM_Type">Avalon-MM Write-Only</parameter>
   <parameter name="F2SDRAM_Width" value="32" />
-  <parameter name="F2SINTERRUPT_Enable" value="false" />
+  <parameter name="F2SINTERRUPT_Enable" value="true" />
   <parameter name="F2S_Width" value="2" />
   <parameter name="FIX_READ_LATENCY" value="8" />
   <parameter name="FORCED_NON_LDC_ADDR_CMD_MEM_CK_INVERT" value="false" />

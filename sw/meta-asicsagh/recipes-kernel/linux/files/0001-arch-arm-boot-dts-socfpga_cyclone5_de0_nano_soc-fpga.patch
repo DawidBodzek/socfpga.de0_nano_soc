@@ -1,4 +1,4 @@
-From 11e2d3b4b9e6bad967b304d9fc2ea18ddd39fe78 Mon Sep 17 00:00:00 2001
+From 8fd8e9ae15d00a6cba21a7c3ce490d1dafbf8d04 Mon Sep 17 00:00:00 2001
 From: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
 Date: Fri, 10 Oct 2025 17:18:47 +0200
 Subject: [PATCH] arch: arm: boot: dts: socfpga_cyclone5_de0_nano_soc: fpga
@@ -8,14 +8,22 @@ Upstream-Status: Inappropriate [internal configuration]
 Signed-off-by: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
 Modified: Dawid Bodzek <dbodzek@student.agh.edu.pl>
 ---
- .../dts/socfpga_cyclone5_de0_nano_soc.dts     | 24 +++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ .../dts/socfpga_cyclone5_de0_nano_soc.dts     | 28 +++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
-index c8f051fb2bf6..c4905769c012 100644
+index c8f051fb2bf6..164201c48f8e 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
-@@ -39,6 +39,30 @@ hps0 {
+@@ -4,6 +4,7 @@
+  */
+ 
+ #include "socfpga_cyclone5.dtsi"
++#include <dt-bindings/interrupt-controller/irq.h>
+ 
+ / {
+ 	model = "Terasic DE-0(Atlas)";
+@@ -39,6 +40,33 @@ hps0 {
  			linux,default-trigger = "heartbeat";
  		};
  	};
@@ -29,13 +37,16 @@ index c8f051fb2bf6..c4905769c012 100644
 +		#address-cells = <1>;
 +		#size-cells = <1>;
 +		
-+		ranges = <0x00000000 0xc0000000 0x10>,
++		ranges = <0x00000000 0xc0000000 0x08>,
 +			 <0x00010000 0xc0010000 0x10000>,
 +			 <0x00020000 0xff200000 0x0020000>;
 +
-+		ltc2308: ltc2308@0 {
-+			compatible = "ltc2308";
-+			reg <0x00000000 0x10>;
++		test: test@0 {
++			compatible = "my_test";
++			reg = <0x00000000 0x08>;
++
++			interrupt-parent = <&intc>;
++			interrupts = <0 40 1>;
 +		};
 +
 +		ocm: ocm@10000 {
@@ -47,5 +58,5 @@ index c8f051fb2bf6..c4905769c012 100644
  
  &gmac1 {
 -- 
-2.49.0
+2.43.7
 

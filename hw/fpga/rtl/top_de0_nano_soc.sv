@@ -15,30 +15,30 @@ module top_de0_nano_soc (
     output logic        HPS_DDR3_WE_N,
     output logic        HPS_DDR3_CK_P,
     output logic        HPS_DDR3_CK_N,
-    inout logic [31:0]  HPS_DDR3_DQ,
-    inout logic [3:0]   HPS_DDR3_DQS_N,
-    inout logic [3:0]   HPS_DDR3_DQS_P,
+    inout wire [31:0]  HPS_DDR3_DQ,
+    inout wire [3:0]   HPS_DDR3_DQS_N,
+    inout wire [3:0]   HPS_DDR3_DQS_P,
     input logic         HPS_DDR3_RZQ,
 
     output logic        HPS_ENET_GTX_CLK,
     output logic        HPS_ENET_MDC,
     output logic [3:0]  HPS_ENET_TX_DATA,
     output logic        HPS_ENET_TX_EN,
-    inout logic         HPS_ENET_INT_N,
-    inout logic         HPS_ENET_MDIO,
+    inout wire         HPS_ENET_INT_N,
+    inout wire         HPS_ENET_MDIO,
     input logic         HPS_ENET_RX_CLK,
     input logic [3:0]   HPS_ENET_RX_DATA,
     input logic         HPS_ENET_RX_DV,
 
     output logic        HPS_SD_CLK,
-    inout logic         HPS_SD_CMD,
-    inout logic [3:0]   HPS_SD_DATA,
+    inout wire         HPS_SD_CMD,
+    inout wire [3:0]   HPS_SD_DATA,
 
     output logic        HPS_UART_TX,
     input logic         HPS_UART_RX,
 
     output logic        HPS_USB_STP,
-    inout logic [7:0]   HPS_USB_DATA,
+    inout wire [7:0]   HPS_USB_DATA,
     input logic         HPS_USB_CLKOUT,
     input logic         HPS_USB_DIR,
     input logic         HPS_USB_NXT,
@@ -62,6 +62,10 @@ always_ff @(posedge CLOCK_50) begin
 	DEBUG_spi_mosi <= ADC_SDI;
 	DEBUG_spi_miso <= ADC_SDO;
 end
+
+/* Local variables and signals */
+
+logic irq_adc_irq;
 
 /* Submodules placement */
 
@@ -129,7 +133,10 @@ de0_nano_soc u0 (
 	 .spi_adc_sclk(ADC_SCLK),
 	 .spi_adc_sdi(ADC_SDI),
 	 .spi_adc_convst(ADC_CONVST),
-	 .spi_adc_sdo(ADC_SDO)
+	 .spi_adc_sdo(ADC_SDO),
+	 
+	 .hps_f2h_irq0_irq({31'b0, irq_adc_irq}),
+	 .irq_adc_irq
 );
 
 endmodule

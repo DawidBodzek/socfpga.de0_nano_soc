@@ -6,6 +6,7 @@ module ctl
 
     output logic [6:0]  t_ticks,
     output logic        t_load,
+	 output logic			fpga_irq,
     output logic        spi_en,
     output logic        spi_convst,
 
@@ -15,7 +16,8 @@ module ctl
     input  logic        hwclr,
     input  logic        en,
 
-    output csr__in_t    csr_in
+    output csr__in_t    csr_in,
+	 input  csr__out_t   csr_out
 );
 
 /* User defined types and constants */
@@ -41,6 +43,7 @@ logic       t_load_nxt, spi_en_nxt, spi_convst_nxt;
 
 assign csr_in.status.data_valid.hwset = spi_done;
 assign csr_in.status.data_valid.hwclr = hwclr;
+assign fpga_irq = csr_out.status.data_valid.value;
 
 /* Module internal logic */
 

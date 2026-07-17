@@ -3,6 +3,8 @@ module ltc2308_ctl
 (
     input logic         clk,
     input logic         rst_n,
+	 
+	 output logic 			fpga_irq,
 
     output logic        spi_sck,
     output logic        spi_mosi,
@@ -66,12 +68,15 @@ ctl u_ctl (
     .t_load,
     .t_ticks,
 
+	 .fpga_irq,
+	 
     .spi_done,
     .spi_en,
     .spi_rx_data,
 
     .spi_convst,
-    .csr_in
+    .csr_in,
+	 .csr_out
 );
 
 timer u_timer (
