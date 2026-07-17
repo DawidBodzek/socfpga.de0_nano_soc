@@ -13,11 +13,14 @@
 #include <linux/wait.h>
 #include <linux/platform_device.h>
 
+#define LTC_DATA_REG 0x0C;
+
 struct ltc2308 {
     struct platform_device *pdev;
     struct miscdevice mdev;
     
     void __iomem *addr;
+    u16 adc_data;
     wait_queue_head_t wait;
     atomic_t ready;
 };
@@ -26,10 +29,11 @@ static irqreturn_t ltc2308_irq_handler(int irq, void *dev_id)
 {
     struct ltc2308 *ltc2308 = (struct ltc2308 *)dev_id;
 
+    ltc2308->adc_data = ioread16(ltc2308->addr + LTC_DATA_REG);
+
     atomic_set(&ltc2308->ready, 1);
     wake_up_interruptible(&ltc2308->wait);
 
-    pr_info("FPGA IRQ\n");
     return IRQ_HANDLED;
 }
 
@@ -39,13 +43,14 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
     struct ltc2308 *ltc2308 = container_of(filp->private_data, struct ltc2308, mdev);
     
     atomic_set(&ltc2308->ready, 0);
-    iowrite32(1, ltc2308->addr);
+    iowrite8(1, ltc2308->addr);
 
     if (wait_event_interruptible(ltc2308->wait, atomic_read(&ltc2308->ready))) {
 	    return -ERESTARTSYS;
     }
 
-    return 0;
+    copy_to_user(buf, &ltc2308->adc_data, sizeof(ltc2308->adc_data));
+    return sizeof(ltc2308->adc_data);
 }
 
 static const struct file_operations ltc2308_fops = {
