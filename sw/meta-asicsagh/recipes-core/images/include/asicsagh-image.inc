@@ -3,5 +3,5 @@ IMAGE_INSTALL += " \
     ocm-tester \
     openssh \
     os-release \
-    test \
+    ltc2308 \
 "
