@@ -1,4 +1,4 @@
-From 8fd8e9ae15d00a6cba21a7c3ce490d1dafbf8d04 Mon Sep 17 00:00:00 2001
+From c56776b229e071768556f4ce11934d939b23ca9a Mon Sep 17 00:00:00 2001
 From: Pawel Skrzypiec <pawel.skrzypiec@agh.edu.pl>
 Date: Fri, 10 Oct 2025 17:18:47 +0200
 Subject: [PATCH] arch: arm: boot: dts: socfpga_cyclone5_de0_nano_soc: fpga
@@ -12,7 +12,7 @@ Modified: Dawid Bodzek <dbodzek@student.agh.edu.pl>
  1 file changed, 28 insertions(+)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
-index c8f051fb2bf6..164201c48f8e 100644
+index c8f051fb2bf6..a338d8350267 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de0_nano_soc.dts
 @@ -4,6 +4,7 @@
@@ -37,13 +37,13 @@ index c8f051fb2bf6..164201c48f8e 100644
 +		#address-cells = <1>;
 +		#size-cells = <1>;
 +		
-+		ranges = <0x00000000 0xc0000000 0x08>,
++		ranges = <0x00000000 0xc0000000 0x10>,
 +			 <0x00010000 0xc0010000 0x10000>,
 +			 <0x00020000 0xff200000 0x0020000>;
 +
-+		test: test@0 {
-+			compatible = "my_test";
-+			reg = <0x00000000 0x08>;
++		ltc2308: ltc2308@0 {
++			compatible = "ltc2308";
++			reg = <0x00000000 0x10>;
 +
 +			interrupt-parent = <&intc>;
 +			interrupts = <0 40 1>;

@@ -13,7 +13,7 @@
 #include <linux/wait.h>
 #include <linux/platform_device.h>
 
-#define LTC_DATA_REG 0x0C;
+#define LTC_DATA_REG 0x0C
 
 struct ltc2308 {
     struct platform_device *pdev;
@@ -21,6 +21,7 @@ struct ltc2308 {
     
     void __iomem *addr;
     u16 adc_data;
+
     wait_queue_head_t wait;
     atomic_t ready;
 };
@@ -41,7 +42,13 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
     size_t count, loff_t *f_pos)
 {
     struct ltc2308 *ltc2308 = container_of(filp->private_data, struct ltc2308, mdev);
-    
+    char data_buf[16];
+    int len;
+
+    if (*f_pos > 0) {
+	return 0;	/* EOF */
+    }
+
     atomic_set(&ltc2308->ready, 0);
     iowrite8(1, ltc2308->addr);
 
@@ -49,8 +56,13 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
 	    return -ERESTARTSYS;
     }
 
-    copy_to_user(buf, &ltc2308->adc_data, sizeof(ltc2308->adc_data));
-    return sizeof(ltc2308->adc_data);
+    len = scnprintf(data_buf, sizeof(data_buf), "%X\n", ltc2308->adc_data);
+    if (copy_to_user(buf, data_buf, len)) {
+	return -EFAULT;
+    }
+
+    *f_pos = *f_pos + len;
+    return len;
 }
 
 static const struct file_operations ltc2308_fops = {
