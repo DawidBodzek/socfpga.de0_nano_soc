@@ -46,7 +46,7 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
     int len;
 
     if (*f_pos > 0) {
-	return 0;	/* EOF */
+	    return 0;	/* EOF */
     }
 
     atomic_set(&ltc2308->ready, 0);
@@ -58,7 +58,7 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
 
     len = scnprintf(data_buf, sizeof(data_buf), "%X\n", ltc2308->adc_data);
     if (copy_to_user(buf, data_buf, len)) {
-	return -EFAULT;
+	    return -EFAULT;
     }
 
     *f_pos = *f_pos + len;
