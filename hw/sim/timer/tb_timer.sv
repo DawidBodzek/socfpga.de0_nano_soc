@@ -5,8 +5,8 @@ module tb_timer();
 logic clk, rst_n;
 int ok;
 
-logic t_done, t_load;
 logic [6:0] t_ticks;
+logic       t_done, t_load;
 
 /* Submodules placement */
 

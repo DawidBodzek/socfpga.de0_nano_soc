@@ -5,15 +5,15 @@ module tb_spi_master();
 logic clk, rst_n;
 int ok;
 
-logic spi_sck_en, spi_sck;
-logic rising_edge, falling_edge;
 logic [3:0] divider;
+logic 		spi_sck_en, spi_sck;
+logic 		rising_edge, falling_edge;
 
-logic spi_en, spi_mosi;
 logic [5:0] spi_tx_data;
+logic 		spi_en, spi_mosi;
 
-logic spi_miso, spi_done;
 logic [11:0] spi_rx_data;
+logic 		 spi_miso, spi_done;
 
 /* Submodules placement */
 

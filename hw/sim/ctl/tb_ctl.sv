@@ -7,16 +7,18 @@ module tb_ctl
 logic clk, rst_n;
 int ok;
 
-logic t_done, t_load;
 logic [6:0] t_ticks;
+logic       t_done, t_load;
 
-logic spi_en, spi_done, spi_sck, spi_mosi, spi_miso, spi_convst;
 logic [11:0] spi_rx_data;
-logic [5:0] spi_tx_data;
+logic [5:0]  spi_tx_data;
+logic        spi_en, spi_done, spi_sck, spi_mosi, spi_miso, spi_convst;
 
-logic en;
+logic en, hwclr;
+logic fpga_irq;
 
-csr__in_t adc_data;
+csr__in_t  csr_in;
+csr__out_t csr_out;
 
 /* Submodules placement */
 
@@ -25,17 +27,22 @@ ctl dut (
     .rst_n,
 
     .en,
+    .spi_convst,
+    
+    .hwclr,
+    .spi_rx_data,
 
     .t_done,
     .t_load,
     .t_ticks,
 
+	.fpga_irq,
+	 
     .spi_done,
     .spi_en,
-    .spi_rx_data,
 
-    .spi_convst,
-    .adc_data
+    .csr_in,
+	.csr_out
 );
 
 timer u_timer (
@@ -108,8 +115,8 @@ task test_ctl();
     
 	repeat(2)
 		@(negedge clk);
-    assert (adc_data.data.result.next == r_data) else
-        $error("adc_data: exp: %h, rcv: %h", r_data, adc_data.data.result.next);
+    assert (csr_in.data.result.next == r_data) else
+        $error("adc_data: exp: %h, rcv: %h", r_data, csr_in.data.result.next);
 
     repeat(10)
         @(negedge clk);

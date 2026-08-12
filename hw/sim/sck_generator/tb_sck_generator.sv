@@ -5,9 +5,9 @@ module tb_sck_generator();
 logic clk, rst_n;
 logic ref_clk;
 
-logic spi_sck_en, spi_sck;
-logic rising_edge, falling_edge;
 logic [3:0] divider;
+logic 		spi_sck_en, spi_sck;
+logic 		rising_edge, falling_edge;
 
 /* Signals assignments */
 
@@ -52,11 +52,10 @@ task test_enabled_clk_division();
 	
 	reset();
 	
-	@(negedge clk);
-	spi_sck_en = 1'b1;
-	
 	fork 
 		begin
+			spi_sck_en = 1'b1;
+			
 			repeat (49)
 				@(negedge clk);
 			
