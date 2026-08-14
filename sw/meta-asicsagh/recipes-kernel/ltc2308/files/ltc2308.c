@@ -20,10 +20,10 @@
 
 /* Bit masks */
 
-#define MODE_MASK     BIT(5)
-#define SIGN_MASK     BIT(4)
-#define CHANNEL_MASK  GENMASK(3, 2)
-#define POLARITY_MASK BIT(1)
+#define SIGNAL_MODE_MASK BIT(5)
+#define SIGN_MASK        BIT(4)
+#define CHANNEL_MASK     GENMASK(3, 2)
+#define POLARITY_MASK    BIT(1)
 
 struct spi_data {
         u8 tx_data;
@@ -52,30 +52,40 @@ static irqreturn_t ltc2308_irq_handler(int irq, void *dev_id)
         return IRQ_HANDLED;
 }
 
+static int ltc2308_conversion(struct ltc2308 *ltc2308)
+{
+        iowrite8(1, ltc2308->addr);
+        if (wait_event_interruptible(ltc2308->waitq, atomic_read(&ltc2308->ready))) {
+                return -ERESTARTSYS;
+        }
+
+        return 0;
+}
+
 static ssize_t ltc2308_read(struct file *filp, char __user *buf,
         size_t count, loff_t *f_pos)
 {
         struct ltc2308 *ltc2308 = container_of(filp->private_data, struct ltc2308, mdev);
         char data_buf[16];
-        int len;
+        int len, ret;
+
+        atomic_set(&ltc2308->ready, 0);
 
         if (*f_pos > 0) {
                 return 0;       /* EOF */
         }
 
-        atomic_set(&ltc2308->ready, 0);
-
         if (atomic_read(&ltc2308->new_cfg)) {
                 atomic_set(&ltc2308->new_cfg, 0);
-                iowrite8(1, ltc2308->addr);
-                if (wait_event_interruptible(ltc2308->waitq, atomic_read(&ltc2308->ready))) {
-                        return -ERESTARTSYS;
+                ret = ltc2308_conversion(ltc2308);
+                if (ret < 0) {
+                        return ret;
                 }
         }
 
-        iowrite8(1, ltc2308->addr);
-        if (wait_event_interruptible(ltc2308->waitq, atomic_read(&ltc2308->ready))) {
-                return -ERESTARTSYS;
+        ret = ltc2308_conversion(ltc2308);
+        if (ret < 0) {
+                return ret;
         }
 
         len = scnprintf(data_buf, sizeof(data_buf), "%X\n", ltc2308->spi_data.rx_data);
@@ -92,54 +102,90 @@ static const struct file_operations ltc2308_fops = {
         .read = ltc2308_read
 };
 
-static ssize_t ltc2308_store(struct device *dev, struct device_attribute *attr, char *buf, size_t count)
+static int ltc2308_set_bits(struct ltc2308 *ltc2308, const char *buf, u8 mask)
+{
+        u8 value;
+        int ret;
+
+        ret = kstrtou8(buf, 0, &value);
+        if (ret < 0) {
+                return ret;
+        }
+
+        ltc2308->spi_data.tx_data &= ~mask;
+        ltc2308->spi_data.tx_data |= FIELD_PREP(mask, value);
+
+        atomic_set(&ltc2308->new_cfg, 1);
+        return 0;
+}
+
+static ssize_t signal_mode_store(struct device *dev, struct device_attribute *attr,
+        const char *buf, size_t count)
 {
         struct ltc2308 *ltc2308 = dev_get_drvdata(dev);
-        u8 tmp, mask;
-        int rv;
+        int ret;
 
-        rv = kstrtou8(buf, 0, &tmp);
-        if (rv < 0) {
-                return rv;
+        ret = ltc2308_set_bits(ltc2308, buf, SIGNAL_MODE_MASK);
+        if (ret < 0) {
+                return ret;
         }
-
-        switch (attr) {
-        case &dev_attr_mode:
-                mask = MODE_MASK;
-                break;
-        case &dev_attr_sign:
-                mask = SIGN_MASK;
-                break;
-        case &dev_attr_channel:
-                mask = CHANNEL_MASK;
-                break;
-        case &dev_attr_polarity:
-                mask = POLARITY_MASK;
-                break;
-        default:
-                return -EINVAL;
-                break;
-        }
-
-        ltc2308->spi_data.tx_data = ltc2308->spi_data.tx_data & ~mask;
-        ltc2308->spi_data.tx_data = ltc2308->spi_data.tx_data | FIELD_PREP(mask, tmp);
-        
-        atomic_set(&ltc2308->new_cfg, 1);
 
         return count;
 }
 
-static DEVICE_ATTR(mode, 0222, ltc2308_store);
-static DEVICE_ATTR(sign, 0222, ltc2308_store);
-static DEVICE_ATTR(channel, 0222, ltc2308_store);
-static DEVICE_ATTR(polarity, 0222, ltc2308_store);
+static ssize_t sign_store(struct device *dev, struct device_attribute *attr, 
+        const char *buf, size_t count)
+{
+        struct ltc2308 *ltc2308 = dev_get_drvdata(dev);
+        int ret;
+
+        ret = ltc2308_set_bits(ltc2308, buf, SIGN_MASK);
+        if (ret < 0) {
+                return ret;
+        }
+
+        return count;
+}
+
+static ssize_t channel_store(struct device *dev, struct device_attribute *attr, 
+        const char *buf, size_t count)
+{
+        struct ltc2308 *ltc2308 = dev_get_drvdata(dev);
+        int ret;
+
+        ret = ltc2308_set_bits(ltc2308, buf, CHANNEL_MASK);
+        if (ret < 0) {
+                return ret;
+        }
+
+        return count;
+}
+
+static ssize_t polarity_store(struct device *dev, struct device_attribute *attr, 
+        const char *buf, size_t count)
+{
+        struct ltc2308 *ltc2308 = dev_get_drvdata(dev);
+        int ret;
+
+        ret = ltc2308_set_bits(ltc2308, buf, POLARITY_MASK);
+        if (ret < 0) {
+                return ret;
+        }
+
+        return count;
+}
+
+static DEVICE_ATTR_WO(signal_mode);
+static DEVICE_ATTR_WO(sign);
+static DEVICE_ATTR_WO(channel);
+static DEVICE_ATTR_WO(polarity);
 
 static struct attribute *ltc2308_attrs[] = {
-        &dev_attr_mode.attr,
+        &dev_attr_signal.attr,
         &dev_attr_sign.attr,
         &dev_attr_channel.attr,
         &dev_attr_polarity.attr,
-        NULL
+        NULL,
 };
 
 ATTRIBUTE_GROUPS(ltc2308);
@@ -172,6 +218,7 @@ static int ltc2308_probe(struct platform_device *pdev)
 
         init_waitqueue_head(&ltc2308->waitq);
         atomic_set(&ltc2308->ready, 0);
+        atomic_set(&ltc2308->new_cfg, 0);
 
         irq = platform_get_irq(pdev, 0);
         if (irq < 0) {
@@ -180,7 +227,8 @@ static int ltc2308_probe(struct platform_device *pdev)
                 return err;
         }
 
-        err = devm_request_irq(&pdev->dev, irq, ltc2308_irq_handler, 0, "ltc2308", ltc2308);
+        err = devm_request_irq(&pdev->dev, irq, ltc2308_irq_handler, 0, "ltc2308", 
+                ltc2308);
         if (err) {
                 dev_err(&pdev->dev, "failed to request irq\n");
                 return err;
