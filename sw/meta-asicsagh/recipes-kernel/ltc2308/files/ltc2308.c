@@ -10,23 +10,41 @@
 #include <linux/atomic.h>
 #include <linux/wait.h>
 #include <linux/platform_device.h>
+#include <linux/bitops.h>
+#include <linux/bitfield.h>
 
-#define LTC_DATA_REG 0x0C
+/* CSR */
+
+#define LTC_DATA_REG     0x0C
+#define LTC_CFG_REG      0x08
+
+/* Bit masks */
+
+#define MODE_MASK     BIT(5)
+#define SIGN_MASK     BIT(4)
+#define CHANNEL_MASK  GENMASK(3, 2)
+#define POLARITY_MASK BIT(1)
+
+struct spi_data {
+        u8 tx_data;
+        u16 rx_data;
+};
 
 struct ltc2308 {
         struct platform_device *pdev;
         struct miscdevice mdev;
+        struct spi_data spi_data;
         void __iomem *addr;
-        u16 adc_data;
         wait_queue_head_t waitq;
         atomic_t ready;
+        atomic_t new_cfg;
 };
 
 static irqreturn_t ltc2308_irq_handler(int irq, void *dev_id)
 {
         struct ltc2308 *ltc2308 = (struct ltc2308 *)dev_id;
 
-        ltc2308->adc_data = ioread16(ltc2308->addr + LTC_DATA_REG);
+        ltc2308->spi_data.rx_data = ioread16(ltc2308->addr + LTC_DATA_REG);
 
         atomic_set(&ltc2308->ready, 1);
         wake_up_interruptible(&ltc2308->waitq);
@@ -37,25 +55,30 @@ static irqreturn_t ltc2308_irq_handler(int irq, void *dev_id)
 static ssize_t ltc2308_read(struct file *filp, char __user *buf,
         size_t count, loff_t *f_pos)
 {
-        struct ltc2308 *ltc2308 = container_of(filp->private_data,
-                struct ltc2308, mdev);
+        struct ltc2308 *ltc2308 = container_of(filp->private_data, struct ltc2308, mdev);
         char data_buf[16];
         int len;
 
         if (*f_pos > 0) {
-                return 0;	/* EOF */
+                return 0;       /* EOF */
         }
 
         atomic_set(&ltc2308->ready, 0);
-        iowrite8(1, ltc2308->addr);
 
-        if (wait_event_interruptible(ltc2308->waitq,
-                atomic_read(&ltc2308->ready))) {
+        if (atomic_read(&ltc2308->new_cfg)) {
+                atomic_set(&ltc2308->new_cfg, 0);
+                iowrite8(1, ltc2308->addr);
+                if (wait_event_interruptible(ltc2308->waitq, atomic_read(&ltc2308->ready))) {
+                        return -ERESTARTSYS;
+                }
+        }
+
+        iowrite8(1, ltc2308->addr);
+        if (wait_event_interruptible(ltc2308->waitq, atomic_read(&ltc2308->ready))) {
                 return -ERESTARTSYS;
         }
 
-        len = scnprintf(data_buf, sizeof(data_buf), "%X\n",
-                ltc2308->adc_data);
+        len = scnprintf(data_buf, sizeof(data_buf), "%X\n", ltc2308->spi_data.rx_data);
         if (copy_to_user(buf, data_buf, len)) {
                 return -EFAULT;
         }
@@ -69,6 +92,58 @@ static const struct file_operations ltc2308_fops = {
         .read = ltc2308_read
 };
 
+static ssize_t ltc2308_store(struct device *dev, struct device_attribute *attr, char *buf, size_t count)
+{
+        struct ltc2308 *ltc2308 = dev_get_drvdata(dev);
+        u8 tmp, mask;
+        int rv;
+
+        rv = kstrtou8(buf, 0, &tmp);
+        if (rv < 0) {
+                return rv;
+        }
+
+        switch (attr) {
+        case &dev_attr_mode:
+                mask = MODE_MASK;
+                break;
+        case &dev_attr_sign:
+                mask = SIGN_MASK;
+                break;
+        case &dev_attr_channel:
+                mask = CHANNEL_MASK;
+                break;
+        case &dev_attr_polarity:
+                mask = POLARITY_MASK;
+                break;
+        default:
+                return -EINVAL;
+                break;
+        }
+
+        ltc2308->spi_data.tx_data = ltc2308->spi_data.tx_data & ~mask;
+        ltc2308->spi_data.tx_data = ltc2308->spi_data.tx_data | FIELD_PREP(mask, tmp);
+        
+        atomic_set(&ltc2308->new_cfg, 1);
+
+        return count;
+}
+
+static DEVICE_ATTR(mode, 0222, ltc2308_store);
+static DEVICE_ATTR(sign, 0222, ltc2308_store);
+static DEVICE_ATTR(channel, 0222, ltc2308_store);
+static DEVICE_ATTR(polarity, 0222, ltc2308_store);
+
+static struct attribute *ltc2308_attrs[] = {
+        &dev_attr_mode.attr,
+        &dev_attr_sign.attr,
+        &dev_attr_channel.attr,
+        &dev_attr_polarity.attr,
+        NULL
+};
+
+ATTRIBUTE_GROUPS(ltc2308);
+
 static int ltc2308_probe(struct platform_device *pdev)
 {
         int err;
@@ -76,8 +151,7 @@ static int ltc2308_probe(struct platform_device *pdev)
         struct ltc2308 *ltc2308;
         struct resource *res;
 
-        ltc2308 = devm_kzalloc(&pdev->dev, sizeof(struct ltc2308),
-                GFP_KERNEL);
+        ltc2308 = devm_kzalloc(&pdev->dev, sizeof(struct ltc2308), GFP_KERNEL);
         if (!ltc2308) {
                 dev_err(&pdev->dev, "failed to allocate struct ltc2308\n");
                 err = -ENOMEM;
@@ -106,8 +180,7 @@ static int ltc2308_probe(struct platform_device *pdev)
                 return err;
         }
 
-        err = devm_request_irq(&pdev->dev, irq, ltc2308_irq_handler, 0,
-                "ltc2308", ltc2308);
+        err = devm_request_irq(&pdev->dev, irq, ltc2308_irq_handler, 0, "ltc2308", ltc2308);
         if (err) {
                 dev_err(&pdev->dev, "failed to request irq\n");
                 return err;
@@ -149,7 +222,8 @@ static struct platform_driver ltc2308_driver = {
         .driver = {
             .name = "ltc2308_driver",
             .owner = THIS_MODULE,
-            .of_match_table = ltc2308_ids
+            .of_match_table = ltc2308_ids,
+            .groups = ltc2308_groups
         }
 };
 
