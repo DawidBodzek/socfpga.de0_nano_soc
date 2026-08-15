@@ -6,6 +6,7 @@
 #include <linux/fs.h>
 #include <linux/miscdevice.h>
 #include <linux/module.h>
+#include <linux/of.h>
 #include <linux/interrupt.h>
 #include <linux/atomic.h>
 #include <linux/wait.h>
@@ -54,6 +55,8 @@ static irqreturn_t ltc2308_irq_handler(int irq, void *dev_id)
 
 static int ltc2308_conversion(struct ltc2308 *ltc2308)
 {
+	atomic_set(&ltc2308->ready, 0);
+
         iowrite8(1, ltc2308->addr);
         if (wait_event_interruptible(ltc2308->waitq, atomic_read(&ltc2308->ready))) {
                 return -ERESTARTSYS;
@@ -69,13 +72,12 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
         char data_buf[16];
         int len, ret;
 
-        atomic_set(&ltc2308->ready, 0);
-
         if (*f_pos > 0) {
                 return 0;       /* EOF */
         }
 
         if (atomic_read(&ltc2308->new_cfg)) {
+		iowrite8(ltc2308->spi_data.tx_data, ltc2308->addr + LTC_CFG_REG);
                 atomic_set(&ltc2308->new_cfg, 0);
                 ret = ltc2308_conversion(ltc2308);
                 if (ret < 0) {
@@ -181,7 +183,7 @@ static DEVICE_ATTR_WO(channel);
 static DEVICE_ATTR_WO(polarity);
 
 static struct attribute *ltc2308_attrs[] = {
-        &dev_attr_signal.attr,
+        &dev_attr_signal_mode.attr,
         &dev_attr_sign.attr,
         &dev_attr_channel.attr,
         &dev_attr_polarity.attr,
@@ -206,6 +208,12 @@ static int ltc2308_probe(struct platform_device *pdev)
 
         ltc2308->pdev = pdev;
         platform_set_drvdata(pdev, ltc2308);
+
+	err = devm_device_add_groups(&pdev->dev, ltc2308_groups);
+	if (err) {
+		dev_err(&pdev->dev, "failed to add group\n");
+		return err;
+	}
 
         res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
         if (!res) {
@@ -270,8 +278,7 @@ static struct platform_driver ltc2308_driver = {
         .driver = {
             .name = "ltc2308_driver",
             .owner = THIS_MODULE,
-            .of_match_table = ltc2308_ids,
-            .groups = ltc2308_groups
+            .of_match_table = ltc2308_ids
         }
 };
 
