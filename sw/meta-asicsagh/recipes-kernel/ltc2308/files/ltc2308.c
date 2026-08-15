@@ -78,7 +78,7 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
 
         /* Configure MUX and operations modes for new conversion */
         if (atomic_read(&ltc2308->new_cfg)) {
-	        iowrite8(ltc2308->spi_data.tx_data, ltc2308->addr + LTC_CFG_REG);
+                iowrite8(ltc2308->spi_data.tx_data, ltc2308->addr + LTC_CFG_REG);
                 atomic_set(&ltc2308->new_cfg, 0);
                 ret = ltc2308_conversion(ltc2308);
                 if (ret < 0) {
@@ -210,11 +210,11 @@ static int ltc2308_probe(struct platform_device *pdev)
         ltc2308->pdev = pdev;
         platform_set_drvdata(pdev, ltc2308);
 
-	err = devm_device_add_groups(&pdev->dev, ltc2308_groups);
-	if (err) {
-		dev_err(&pdev->dev, "failed to add group\n");
-		return err;
-	}
+        err = devm_device_add_groups(&pdev->dev, ltc2308_groups);
+        if (err) {
+                dev_err(&pdev->dev, "failed to add group\n");
+                return err;
+        }
 
         res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
         if (!res) {
