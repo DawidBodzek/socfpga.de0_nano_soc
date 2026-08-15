@@ -47,10 +47,10 @@ spi u_spi (
     .spi_done,
 
     .spi_rx_data,
-    .spi_tx_data({csr_out.cfg.single_ended.value, 
-                  csr_out.cfg.odd.value, 
-                  csr_out.cfg.channel_addr.value,
-                  csr_out.cfg.unipolar.value,
+    .spi_tx_data({csr_out.cfg.signal_mode.value, 
+                  csr_out.cfg.sign.value, 
+                  csr_out.cfg.channel.value,
+                  csr_out.cfg.polarity.value,
                   csr_out.cfg.sleep.value}),
     .spi_sck,
 

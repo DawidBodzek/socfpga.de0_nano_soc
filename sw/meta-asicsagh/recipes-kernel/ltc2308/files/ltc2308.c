@@ -76,8 +76,9 @@ static ssize_t ltc2308_read(struct file *filp, char __user *buf,
                 return 0;       /* EOF */
         }
 
+        /* Configure MUX and operations modes for new conversion */
         if (atomic_read(&ltc2308->new_cfg)) {
-		iowrite8(ltc2308->spi_data.tx_data, ltc2308->addr + LTC_CFG_REG);
+	        iowrite8(ltc2308->spi_data.tx_data, ltc2308->addr + LTC_CFG_REG);
                 atomic_set(&ltc2308->new_cfg, 0);
                 ret = ltc2308_conversion(ltc2308);
                 if (ret < 0) {

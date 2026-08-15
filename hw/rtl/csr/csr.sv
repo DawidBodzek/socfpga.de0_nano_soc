@@ -131,19 +131,19 @@ module csr (
             struct {
                 logic next;
                 logic load_next;
-            } unipolar;
+            } polarity;
             struct {
                 logic [1:0] next;
                 logic load_next;
-            } channel_addr;
+            } channel;
             struct {
                 logic next;
                 logic load_next;
-            } odd;
+            } sign;
             struct {
                 logic next;
                 logic load_next;
-            } single_ended;
+            } signal_mode;
         } cfg;
     } field_combo_t;
     field_combo_t field_combo;
@@ -165,16 +165,16 @@ module csr (
             } sleep;
             struct {
                 logic value;
-            } unipolar;
+            } polarity;
             struct {
                 logic [1:0] value;
-            } channel_addr;
+            } channel;
             struct {
                 logic value;
-            } odd;
+            } sign;
             struct {
                 logic value;
-            } single_ended;
+            } signal_mode;
         } cfg;
     } field_storage_t;
     field_storage_t field_storage;
@@ -254,98 +254,98 @@ module csr (
         end
     end
     assign hwif_out.cfg.sleep.value = field_storage.cfg.sleep.value;
-    // Field: csr.cfg.unipolar
+    // Field: csr.cfg.polarity
     always_comb begin
         automatic logic [0:0] next_c;
         automatic logic load_next_c;
-        next_c = field_storage.cfg.unipolar.value;
+        next_c = field_storage.cfg.polarity.value;
         load_next_c = '0;
         if(decoded_reg_strb.cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.cfg.unipolar.value & ~decoded_wr_biten[1:1]) | (decoded_wr_data[1:1] & decoded_wr_biten[1:1]);
+            next_c = (field_storage.cfg.polarity.value & ~decoded_wr_biten[1:1]) | (decoded_wr_data[1:1] & decoded_wr_biten[1:1]);
             load_next_c = '1;
         end
-        field_combo.cfg.unipolar.next = next_c;
-        field_combo.cfg.unipolar.load_next = load_next_c;
+        field_combo.cfg.polarity.next = next_c;
+        field_combo.cfg.polarity.load_next = load_next_c;
     end
     always_ff @(posedge clk or negedge arst_n) begin
         if(~arst_n) begin
-            field_storage.cfg.unipolar.value <= 1'h1;
+            field_storage.cfg.polarity.value <= 1'h0;
         end else begin
-            if(field_combo.cfg.unipolar.load_next) begin
-                field_storage.cfg.unipolar.value <= field_combo.cfg.unipolar.next;
+            if(field_combo.cfg.polarity.load_next) begin
+                field_storage.cfg.polarity.value <= field_combo.cfg.polarity.next;
             end
         end
     end
-    assign hwif_out.cfg.unipolar.value = field_storage.cfg.unipolar.value;
-    // Field: csr.cfg.channel_addr
+    assign hwif_out.cfg.polarity.value = field_storage.cfg.polarity.value;
+    // Field: csr.cfg.channel
     always_comb begin
         automatic logic [1:0] next_c;
         automatic logic load_next_c;
-        next_c = field_storage.cfg.channel_addr.value;
+        next_c = field_storage.cfg.channel.value;
         load_next_c = '0;
         if(decoded_reg_strb.cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.cfg.channel_addr.value & ~decoded_wr_biten[3:2]) | (decoded_wr_data[3:2] & decoded_wr_biten[3:2]);
+            next_c = (field_storage.cfg.channel.value & ~decoded_wr_biten[3:2]) | (decoded_wr_data[3:2] & decoded_wr_biten[3:2]);
             load_next_c = '1;
         end
-        field_combo.cfg.channel_addr.next = next_c;
-        field_combo.cfg.channel_addr.load_next = load_next_c;
+        field_combo.cfg.channel.next = next_c;
+        field_combo.cfg.channel.load_next = load_next_c;
     end
     always_ff @(posedge clk or negedge arst_n) begin
         if(~arst_n) begin
-            field_storage.cfg.channel_addr.value <= 2'h0;
+            field_storage.cfg.channel.value <= 2'h0;
         end else begin
-            if(field_combo.cfg.channel_addr.load_next) begin
-                field_storage.cfg.channel_addr.value <= field_combo.cfg.channel_addr.next;
+            if(field_combo.cfg.channel.load_next) begin
+                field_storage.cfg.channel.value <= field_combo.cfg.channel.next;
             end
         end
     end
-    assign hwif_out.cfg.channel_addr.value = field_storage.cfg.channel_addr.value;
-    // Field: csr.cfg.odd
+    assign hwif_out.cfg.channel.value = field_storage.cfg.channel.value;
+    // Field: csr.cfg.sign
     always_comb begin
         automatic logic [0:0] next_c;
         automatic logic load_next_c;
-        next_c = field_storage.cfg.odd.value;
+        next_c = field_storage.cfg.sign.value;
         load_next_c = '0;
         if(decoded_reg_strb.cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.cfg.odd.value & ~decoded_wr_biten[4:4]) | (decoded_wr_data[4:4] & decoded_wr_biten[4:4]);
+            next_c = (field_storage.cfg.sign.value & ~decoded_wr_biten[4:4]) | (decoded_wr_data[4:4] & decoded_wr_biten[4:4]);
             load_next_c = '1;
         end
-        field_combo.cfg.odd.next = next_c;
-        field_combo.cfg.odd.load_next = load_next_c;
+        field_combo.cfg.sign.next = next_c;
+        field_combo.cfg.sign.load_next = load_next_c;
     end
     always_ff @(posedge clk or negedge arst_n) begin
         if(~arst_n) begin
-            field_storage.cfg.odd.value <= 1'h1;
+            field_storage.cfg.sign.value <= 1'h0;
         end else begin
-            if(field_combo.cfg.odd.load_next) begin
-                field_storage.cfg.odd.value <= field_combo.cfg.odd.next;
+            if(field_combo.cfg.sign.load_next) begin
+                field_storage.cfg.sign.value <= field_combo.cfg.sign.next;
             end
         end
     end
-    assign hwif_out.cfg.odd.value = field_storage.cfg.odd.value;
-    // Field: csr.cfg.single_ended
+    assign hwif_out.cfg.sign.value = field_storage.cfg.sign.value;
+    // Field: csr.cfg.signal_mode
     always_comb begin
         automatic logic [0:0] next_c;
         automatic logic load_next_c;
-        next_c = field_storage.cfg.single_ended.value;
+        next_c = field_storage.cfg.signal_mode.value;
         load_next_c = '0;
         if(decoded_reg_strb.cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.cfg.single_ended.value & ~decoded_wr_biten[5:5]) | (decoded_wr_data[5:5] & decoded_wr_biten[5:5]);
+            next_c = (field_storage.cfg.signal_mode.value & ~decoded_wr_biten[5:5]) | (decoded_wr_data[5:5] & decoded_wr_biten[5:5]);
             load_next_c = '1;
         end
-        field_combo.cfg.single_ended.next = next_c;
-        field_combo.cfg.single_ended.load_next = load_next_c;
+        field_combo.cfg.signal_mode.next = next_c;
+        field_combo.cfg.signal_mode.load_next = load_next_c;
     end
     always_ff @(posedge clk or negedge arst_n) begin
         if(~arst_n) begin
-            field_storage.cfg.single_ended.value <= 1'h1;
+            field_storage.cfg.signal_mode.value <= 1'h0;
         end else begin
-            if(field_combo.cfg.single_ended.load_next) begin
-                field_storage.cfg.single_ended.value <= field_combo.cfg.single_ended.next;
+            if(field_combo.cfg.signal_mode.load_next) begin
+                field_storage.cfg.signal_mode.value <= field_combo.cfg.signal_mode.next;
             end
         end
     end
-    assign hwif_out.cfg.single_ended.value = field_storage.cfg.single_ended.value;
+    assign hwif_out.cfg.signal_mode.value = field_storage.cfg.signal_mode.value;
     assign hwif_out.data.result.swacc = decoded_reg_strb.data;
 
     //--------------------------------------------------------------------------

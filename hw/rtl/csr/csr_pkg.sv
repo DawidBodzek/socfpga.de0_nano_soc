@@ -51,26 +51,26 @@ package csr_pkg;
 
     typedef struct {
         logic value;
-    } csr__cfg__unipolar__out_t;
+    } csr__cfg__polarity__out_t;
 
     typedef struct {
         logic [1:0] value;
-    } csr__cfg__channel_addr__out_t;
+    } csr__cfg__channel__out_t;
 
     typedef struct {
         logic value;
-    } csr__cfg__odd__out_t;
+    } csr__cfg__sign__out_t;
 
     typedef struct {
         logic value;
-    } csr__cfg__single_ended__out_t;
+    } csr__cfg__signal_mode__out_t;
 
     typedef struct {
         csr__cfg__sleep__out_t sleep;
-        csr__cfg__unipolar__out_t unipolar;
-        csr__cfg__channel_addr__out_t channel_addr;
-        csr__cfg__odd__out_t odd;
-        csr__cfg__single_ended__out_t single_ended;
+        csr__cfg__polarity__out_t polarity;
+        csr__cfg__channel__out_t channel;
+        csr__cfg__sign__out_t sign;
+        csr__cfg__signal_mode__out_t signal_mode;
     } csr__cfg__out_t;
 
     typedef struct {
