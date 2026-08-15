@@ -55,7 +55,7 @@ static irqreturn_t ltc2308_irq_handler(int irq, void *dev_id)
 
 static int ltc2308_conversion(struct ltc2308 *ltc2308)
 {
-	atomic_set(&ltc2308->ready, 0);
+        atomic_set(&ltc2308->ready, 0);
 
         iowrite8(1, ltc2308->addr);
         if (wait_event_interruptible(ltc2308->waitq, atomic_read(&ltc2308->ready))) {
